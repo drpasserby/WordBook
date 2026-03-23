@@ -34,7 +34,22 @@
     </div>
 </template>
 <script>
-
+export default {
+    data() {
+        return {
+            title: '剑斗词典',
+            searchWord: ''
+        }
+    },
+    methods: {
+        handleSearch() {
+            console.log(this.searchWord)
+        }
+    },
+    mounted() {
+        console.log('Home mounted')
+    }
+}
 </script>
 <style>
 .container {
