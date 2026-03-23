@@ -4,7 +4,6 @@
             <span class="logo-text">{{ title }}</span>
         </div>
         <div class="search-container">
-            
             <el-input
                 class="search-input"
                 placeholder="输入词汇"
@@ -31,23 +30,69 @@
                 </template>
             </el-input>
         </div>
+        <div>
+            <h1>测试使用，正式开发后删除</h1>
+            <div v-for="i in searchResults" :key="i" :label="i" :value="i" >{{ i.id + i.w }}</div>
+        </div>
     </div>
 </template>
 <script>
+import axios from 'axios';
 export default {
     data() {
         return {
             title: '剑斗词典',
-            searchWord: ''
+            searchWord: '',
+            wordData: [],
+            searchResults:[]
         }
     },
     methods: {
         handleSearch() {
-            console.log(this.searchWord)
+            const searchTerm = this.searchWord.trim().toLowerCase();
+            if (!searchTerm) {
+                console.log('请输入搜索关键词');
+                return;
+            }
+
+            if (!this.wordData || this.wordData.length === 0) {
+                console.log('词库数据尚未加载，请稍后再试');
+                return;
+            }
+
+            // 递归搜索函数
+            const searchInObject = (obj, term) => {
+                if (typeof obj === 'string') {
+                    return obj.toLowerCase().includes(term);
+                }
+                if (Array.isArray(obj)) {
+                    return obj.some(item => searchInObject(item, term));
+                }
+                if (obj && typeof obj === 'object') {
+                    return Object.values(obj).some(value => searchInObject(value, term));
+                }
+                return false;
+            };
+
+            const results = this.wordData.filter(item => searchInObject(item, searchTerm));
+            this.searchResults = results
+
+            console.log(`搜索关键词: "${this.searchWord}"`);
+            console.log(`匹配到 ${results.length} 条结果:`);
+            results.forEach((item, index) => {
+                console.log(`[${index + 1}]`, item);
+            });
+
+            if (results.length === 0) {
+                console.log('未找到匹配的词汇');
+            }
         }
     },
     mounted() {
-        console.log('Home mounted')
+        axios.get('https://my.wulvxinchen.cn/download/wordData.json').then(res=>{
+            this.wordData = res.data.wordData
+            console.log(this.wordData)
+      })
     }
 }
 </script>
