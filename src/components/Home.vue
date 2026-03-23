@@ -37,5 +37,60 @@
 
 </script>
 <style>
+.container {
+  max-width: 80%;
+  margin: 40px auto;
+  padding: 20px 30px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  transition: all .5s;
+}
 
+.container:hover {
+  box-shadow:
+    2.3px 1.6px 2px rgba(0, 0, 0, 0.017),
+    4.4px 3px 4.2px rgba(0, 0, 0, 0.026),
+    6.5px 4.4px 7px rgba(0, 0, 0, 0.034),
+    8.7px 6px 11.1px rgba(0, 0, 0, 0.042),
+    11.5px 7.9px 18.5px rgba(0, 0, 0, 0.053),
+    16px 11px 37px rgba(0, 0, 0, 0.07);
+}
+
+.home-container{
+    padding-top: 10em;
+    height: 40em;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo-text {
+  font-family: 'Product Sans', Arial, sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+    width: 60%;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+    .search-input {
+        width: 100%;
+    }
+}
 </style>
