@@ -1,14 +1,25 @@
 <template>
-    <div class="container">
-        <a href="./">返回主页</a>
+    <div>
+        <div class="container">
+            <a href="./">返回主页</a>
+            <el-divider direction="vertical" />
+            <a href="./">内容反馈</a>
+        </div>
+
+
+
     </div>
 </template>
 <script>
+import { ElMessage,ElMessageBox } from 'element-plus';
 export default {
   data(){
     return {
-      thisYear: new Date().getFullYear()
+
     }},
+    methods: {
+
+    }
 }
 </script>
 <style scoped>
