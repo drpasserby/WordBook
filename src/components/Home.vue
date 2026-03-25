@@ -1,4 +1,5 @@
 <template>
+    <Header />
     <div class="container home-container">
         <div class="logo">
             <span class="logo-text">{{ title }}</span>
@@ -38,7 +39,9 @@
 </template>
 <script>
 import axios from 'axios';
+import Header from './Header.vue';
 export default {
+  components: { Header },
     data() {
         return {
             title: '剑斗词典',
