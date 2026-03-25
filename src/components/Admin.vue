@@ -5,7 +5,24 @@
             <el-divider direction="vertical" />
             <a href="./">内容反馈</a>
         </div>
-
+        <div class="container">
+            <h3>数据导入导出</h3>
+            <div>
+                <el-upload
+                    ref="uploadRef"
+                    action="#"
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    accept=".json,application/json"
+                    :on-change="importJson"
+                    style="display:inline"
+                >
+                    <el-button type="primary">读取</el-button>
+                </el-upload>
+                <el-divider direction="vertical" />
+                <el-button type="primary" @click="ExportJson">导出</el-button>
+            </div>
+            </div>
 
 
     </div>
