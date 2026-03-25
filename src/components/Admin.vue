@@ -23,7 +23,21 @@
                 <el-button type="primary" @click="ExportJson">导出</el-button>
             </div>
             </div>
-
+        <div class="container">
+            <h3>词条管理</h3>
+            <div>
+                <el-table :data="AllData.wordData" stripe border v-loading="loading" style="width: 100%" height="600">
+                    <el-table-column prop="id" label="ID" width="180"/>
+                    <el-table-column prop="w" label="词汇"/>
+                    <el-table-column prop="t" label="标签"/>
+                    <el-table-column fixed="right" label="操作">
+                    <template #default="{row}">
+                        <el-button link type="primary" @click="editTool(row.id)">编辑</el-button>
+                    </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
 
     </div>
 </template>
