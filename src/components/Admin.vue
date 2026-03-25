@@ -38,7 +38,12 @@
                 </el-table>
             </div>
         </div>
-
+        <div class="container">
+            <h3>热词管理</h3>
+        </div>
+        <div class="container">
+            <h3>其他设置</h3>
+        </div>
     </div>
 </template>
 <script>
