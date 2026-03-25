@@ -51,10 +51,54 @@ import { ElMessage,ElMessageBox } from 'element-plus';
 export default {
   data(){
     return {
-
+      AllData: {
+        wordData: [],
+        hotWords: [],
+        settings: {}
+        // 其他数据类型可以动态添加
+      },
+      loading: false
     }},
     methods: {
+      importJson(file){
+        // file 是 el-upload 包装的文件对象，包含 raw 属性（原始文件）
+        if (!file || !file.raw) return;
 
+        this.loading = true;
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          try {
+            const json = JSON.parse(e.target.result);
+
+            // 合并所有数据到AllData中
+            Object.assign(this.AllData, json);
+
+            const wordCount = this.AllData.wordData.length;
+            const hotWordCount = this.AllData.hotWords.length;
+            ElMessage.success(`成功导入数据：${wordCount} 条词汇，${hotWordCount} 条热词`);
+
+            // 清空已选择的文件列表
+            this.$refs.uploadRef.clearFiles();
+
+          } catch (error) {
+            ElMessage.error('解析JSON文件失败：' + error.message);
+          } finally {
+            this.loading = false;
+          }
+        };
+
+        reader.onerror = () => {
+          this.$message.error('读取文件失败');
+          this.loading = false;
+          this.$refs.uploadRef.clearFiles();
+        };
+
+        reader.readAsText(file.raw);
+      },
+      ExportJson(){
+
+      }
     }
 }
 </script>
