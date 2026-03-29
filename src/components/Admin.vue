@@ -20,7 +20,7 @@
                     <el-button type="primary">读取</el-button>
                 </el-upload>
                 <el-divider direction="vertical" />
-                <el-button type="primary" @click="ExportJson">导出</el-button>
+                <el-button type="primary" @click="exportJson">导出</el-button>
             </div>
             </div>
         <div class="container">
@@ -89,15 +89,49 @@ export default {
         };
 
         reader.onerror = () => {
-          this.$message.error('读取文件失败');
+          ElMessage.error('读取文件失败');
           this.loading = false;
           this.$refs.uploadRef.clearFiles();
         };
 
         reader.readAsText(file.raw);
       },
-      ExportJson(){
+      exportJson(){
+        try {
+          // 准备导出的数据
+          const exportData = {
+            hotWords: Array.isArray(this.AllData.hotWords) ? this.AllData.hotWords : [],
+            settings: typeof this.AllData.settings === 'object' && this.AllData.settings !== null ? this.AllData.settings : {},
+            wordData: Array.isArray(this.AllData.wordData) ? this.AllData.wordData : []
+          };
 
+          // 转换为JSON字符串，格式化输出（缩进2个空格）
+          const jsonString = JSON.stringify(exportData, null, 2);
+
+          // 创建Blob对象
+          const blob = new Blob([jsonString], { type: 'application/json' });
+
+          // 创建下载链接
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'wordData.json'; // 固定文件名，与参考文件一致
+
+          // 触发下载
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // 释放URL对象
+          URL.revokeObjectURL(url);
+
+          const wordCount = exportData.wordData.length;
+          const hotWordCount = exportData.hotWords.length;
+          ElMessage.success(`成功导出数据：${wordCount} 条词汇，${hotWordCount} 条热词`);
+
+        } catch (error) {
+          ElMessage.error('导出数据失败：' + error.message);
+        }
       }
     }
 }
