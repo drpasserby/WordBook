@@ -40,6 +40,33 @@
         </div>
         <div class="container">
             <h3>热词管理</h3>
+            <div style="margin-bottom: 16px;">
+                <el-input
+                    v-model="newHotWord"
+                    placeholder="输入新热词"
+                    style="width: 200px; margin-right: 10px;"
+                    @keyup.enter="addHotWord"
+                />
+                <el-button type="primary" @click="addHotWord">添加</el-button>
+            </div>
+            <div>
+                <el-tag
+                    v-for="(word, index) in AllData.hotWords"
+                    :key="index"
+                    closable
+                    :disable-transitions="false"
+                    @close="removeHotWord(index)"
+                    style="margin-right: 8px; margin-bottom: 8px;"
+                >
+                    {{ word }}
+                </el-tag>
+                <el-tag
+                    v-if="AllData.hotWords.length === 0"
+                    type="info"
+                >
+                    暂无热词，请添加
+                </el-tag>
+            </div>
         </div>
         <div class="container">
             <h3>其他设置</h3>
@@ -57,7 +84,8 @@ export default {
         settings: {}
         // 其他数据类型可以动态添加
       },
-      loading: false
+      loading: false,
+      newHotWord: ''
     }},
     methods: {
       importJson(file){
@@ -132,6 +160,23 @@ export default {
         } catch (error) {
           ElMessage.error('导出数据失败：' + error.message);
         }
+      },
+      addHotWord() {
+        if (!this.newHotWord.trim()) {
+          ElMessage.warning('请输入热词');
+          return;
+        }
+        if (this.AllData.hotWords.includes(this.newHotWord.trim())) {
+          ElMessage.warning('该热词已存在');
+          return;
+        }
+        this.AllData.hotWords.push(this.newHotWord.trim());
+        this.newHotWord = '';
+        ElMessage.success('热词添加成功');
+      },
+      removeHotWord(index) {
+        this.AllData.hotWords.splice(index, 1);
+        ElMessage.success('热词已移除');
       }
     }
 }
