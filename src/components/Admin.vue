@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="container">
-            <a href="./">返回主页</a>
+            <router-link to="/">返回主页</router-link>
             <el-divider direction="vertical" />
-            <a href="./">内容反馈</a>
+            <a @click="jumpFeedback">内容反馈</a>
         </div>
         <div class="container">
             <h3>数据导入导出</h3>
@@ -25,9 +25,11 @@
             </div>
         <div class="container">
             <h3>词条管理</h3>
+            <el-button type="primary" @click="addTool()">添加新词条</el-button>
+            <br><br>
             <div>
                 <el-table :data="AllData.wordData" stripe border v-loading="loading" style="width: 100%" height="600">
-                    <el-table-column prop="id" label="ID" width="180"/>
+                    <el-table-column prop="id" label="ID"/>
                     <el-table-column prop="w" label="词汇"/>
                     <el-table-column prop="t" label="标签"/>
                     <el-table-column fixed="right" label="操作">
@@ -70,7 +72,57 @@
         </div>
         <div class="container">
             <h3>其他设置</h3>
+            <p>最后编辑日期：{{ AllData.settings.lastUpdate || '未设置' }}</p>
         </div>
+        <el-dialog v-model="editFormVisible" :title="isEditMode ? '编辑词条' : '添加词条'" width="500" align-center>
+          <el-form>
+            <el-form-item label="词条ID">
+              <el-input v-model="editToolForm.id"/>
+            </el-form-item>
+            <el-form-item label="词条">
+              <el-input v-model="editToolForm.w" />
+            </el-form-item>
+            <el-form-item label="标签">
+              <el-select
+                v-model="editToolForm.t"
+                multiple
+                allow-create
+                filterable
+                placeholder="选择或输入标签"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="tag in getAllTags()"
+                  :key="tag"
+                  :label="tag"
+                  :value="tag"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="释义">
+              <el-input v-model="editToolForm.m" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"/>
+            </el-form-item>
+            <el-form-item label="贡献者">
+              <el-input v-model="editToolForm.a" />
+            </el-form-item>
+            <el-form-item label="最后编辑日期">
+              <el-input v-model="editToolForm.d" />
+              <el-button link type="primary" @click="setNowDate()">获取当前日期</el-button>
+            </el-form-item>
+
+            <el-form-item label="备注">
+              <el-input v-model="editToolForm.e" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea"/>
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <div>
+              <el-button @click="editFormVisible = false">取消</el-button>
+              <el-button type="primary" @click="saveEditTool()">提交</el-button>
+            </div>
+          </template>
+        </el-dialog>
+
+
     </div>
 </template>
 <script>
@@ -85,7 +137,18 @@ export default {
         // 其他数据类型可以动态添加
       },
       loading: false,
-      newHotWord: ''
+      newHotWord: '',
+      editFormVisible: false,
+      editToolForm: {
+        id: 0,
+        w: '',
+        t: [],
+        m: '',
+        a: '',
+        d: '',
+        e: ''
+      },
+      isEditMode: false
     }},
     methods: {
       importJson(file){
@@ -126,6 +189,7 @@ export default {
       },
       exportJson(){
         try {
+          this.AllData.settings.lastUpdate = new Date().toISOString().split('T')[0]; // 更新最后编辑日期为当前日期
           // 准备导出的数据
           const exportData = {
             hotWords: Array.isArray(this.AllData.hotWords) ? this.AllData.hotWords : [],
