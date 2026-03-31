@@ -45,6 +45,20 @@
                 </ul>
             </div>
         </div>
+        <div class="hotword-container">
+            <h3>热词推荐</h3>
+            <div>
+                <el-tag
+                    v-for="(w, index) in hotWord"
+                    :key="index"
+                    type="info"
+                    @click="useHotWord(w)"
+                    style="cursor: pointer; margin-right: 8px; margin-bottom: 8px;"
+                >
+                    {{ w }}
+                </el-tag>
+            </div>
+        </div>
         <div class="final-result" v-show="Object.keys(finalResult).length > 0">
             <p class="result-name"><strong>{{ finalResult.w }}</strong></p>
             
@@ -100,6 +114,7 @@ export default {
             title: '剑斗词典',
             searchWord: '',
             wordData: [],
+            hotWord:[],
             searchResults:[],
             suggestions: [],
             finalResult:{},
@@ -212,11 +227,16 @@ export default {
                 this.showSuggestions = false;
                 this.blurTimer = null;
             }, 200);
-        }
+        },
+        useHotWord(word) {
+            this.searchWord = word;
+            this.handleSearch();
+        },
     },
     mounted() {
-        axios.get('https://my.wulvxinchen.cn/download/wordData.json').then(res=>{
+        axios.get('https://my.wulvxinchen.cn/wordbook/wordData.json').then(res=>{
             this.wordData = res.data.wordData
+            this.hotWord = res.data.hotWords
             console.log(this.wordData)
       })
     }
@@ -244,7 +264,7 @@ export default {
 
 .home-container{
     padding-top: 10em;
-    height: 40em;
+    padding-bottom: 10em;
 }
 
 .logo {
@@ -306,6 +326,11 @@ export default {
     border-bottom: 1px solid #ebeef5;
 }
 
+.hotword-container{
+    margin: 2em auto;
+    width: 60%;
+}
+
 .final-result{
     margin: 2em 0;
     padding: 2em;
@@ -346,6 +371,9 @@ export default {
     .suggestions-container {
         width: 100%;
         left: 0;
+    }
+    .hotword-container{
+        width: 100%;
     }
 }
 </style>
