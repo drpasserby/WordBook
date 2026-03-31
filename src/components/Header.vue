@@ -5,7 +5,7 @@
         <el-divider direction="vertical" />
         <a @click="jumpFeedback">网站反馈</a>
         <el-divider direction="vertical" />
-        <a href="./admin">管理后台</a>
+        <router-link to="/admin">管理后台</router-link>
         </span>
     </div>
 </template>
