@@ -165,6 +165,14 @@ export default {
             // 合并所有数据到AllData中
             Object.assign(this.AllData, json);
 
+            // id 可能是字符串，统一转为数值并保留原始数据的其他属性
+            if (Array.isArray(this.AllData.wordData)) {
+              this.AllData.wordData = this.AllData.wordData.map(item => ({
+                ...item,
+                id: Number(item.id)
+              }));
+            }
+
             const wordCount = this.AllData.wordData.length;
             const hotWordCount = this.AllData.hotWords.length;
             ElMessage.success(`成功导入数据：${wordCount} 条词汇，${hotWordCount} 条热词`);
@@ -241,6 +249,119 @@ export default {
       removeHotWord(index) {
         this.AllData.hotWords.splice(index, 1);
         ElMessage.success('热词已移除');
+      },
+      editTool(id) {
+        // 根据id找到对应的词条
+        const wordItem = this.AllData.wordData.find(item => item.id === id);
+        if (!wordItem) {
+          ElMessage.error('未找到对应的词条');
+          return;
+        }
+        // 复制数据到表单
+        this.editToolForm = {
+          id: wordItem.id,
+          w: wordItem.w || '',
+          t: Array.isArray(wordItem.t) ? [...wordItem.t] : [],
+          m: wordItem.m || '',
+          a: wordItem.a || '',
+          d: wordItem.d || '',
+          e: wordItem.e || ''
+        };
+        this.isEditMode = true;
+        this.editFormVisible = true;
+      },
+      addTool() {
+        // 生成新ID：最大ID + 1
+        let maxId = 0;
+        if (this.AllData.wordData.length > 0) {
+          maxId = Math.max(...this.AllData.wordData.map(item => item.id));
+        }
+        this.editToolForm = {
+          id: maxId + 1,
+          w: '',
+          t: [],
+          m: '',
+          a: '',
+          d: '',
+          e: ''
+        };
+        this.isEditMode = false;
+        this.editFormVisible = true;
+      },
+      saveEditTool() {
+        try {
+          // 验证必要字段
+          if (!this.editToolForm.w.trim()) {
+            ElMessage.warning('请输入词汇');
+            return;
+          }
+
+          // 强制把id转换为数值
+          const parsedId = Number(this.editToolForm.id);
+          if (Number.isNaN(parsedId)) {
+            ElMessage.warning('ID必须为数字');
+            return;
+          }
+
+          this.editToolForm.id = parsedId;
+
+          // 找到原词条的索引（用数值ID匹配）
+          const index = this.AllData.wordData.findIndex(item => item.id === parsedId);
+
+          if (index !== -1) {
+            // 更新现有词条
+            this.AllData.wordData[index] = { ...this.editToolForm };
+            ElMessage.success('词条更新成功');
+          } else {
+            // 添加新词条 - 检查ID是否已存在（用户可能修改了ID）
+            const idExists = this.AllData.wordData.some(item => item.id === parsedId);
+            if (idExists) {
+              ElMessage.error('ID已存在，请使用不同的ID');
+              return;
+            }
+            this.AllData.wordData.push({ ...this.editToolForm });
+            ElMessage.success('词条添加成功');
+          }
+
+          this.editFormVisible = false;
+        } catch (error) {
+          ElMessage.error('保存词条失败：' + error.message);
+        }
+      },
+      getAllTags() {
+        // 获取所有词条中的所有标签，去重
+        const tags = new Set();
+        this.AllData.wordData.forEach(item => {
+          if (Array.isArray(item.t)) {
+            item.t.forEach(tag => {
+              if (tag && tag.trim() !== '') {
+                tags.add(tag.trim());
+              }
+            });
+          }
+        });
+        return Array.from(tags);
+      },
+      setNowDate() {
+        const now = new Date();
+        const year = now.getFullYear().toString(); // 获取后两位年份
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        this.editToolForm.d = `${year}-${month}-${day}`;
+      },
+      jumpFeedback() {
+        ElMessageBox.confirm('请添加剑斗交流群：916779244', '提示', {
+          confirmButtonText: '确认加入',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(() => {
+          window.open('https://qun.qq.com/universal-share/share?ac=1&authKey=eU02f9yXH9TmjB4gsAouKUjCE5GN5a1LpDOESF7osvZ21%2BVNiU%2F9FO%2FOKfog1onn&busi_data=eyJncm91cENvZGUiOiI5MTY3NzkyNDQiLCJ0b2tlbiI6IkVkdGdxV3RxeTNweEZxR2xabjVNcGFrUVprWGkrNEZONFpuaHVuTEtmM250R2NSYll4bGYwZDdJaHdWeHpkU3QiLCJ1aW4iOiIzOTc2ODI5OTY5In0%3D&data=5HmxM6CIH3PAcLXCciDRdC-TnZpEN791raNCSpqpCSjuWh03OIuffMmJso3cl-SHVKOhDLydTLgqaJKXz0-U3A&svctype=4&tempid=h5_group_info', '_blank');
+        }).catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '取消发送反馈',
+          })
+        })
       }
     }
 }
