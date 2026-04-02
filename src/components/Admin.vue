@@ -17,8 +17,10 @@
                     :on-change="importJson"
                     style="display:inline"
                 >
-                    <el-button type="primary">读取</el-button>
+                    <el-button type="primary">本地读取</el-button>
                 </el-upload>
+                <el-divider direction="vertical" />
+                <el-button type="primary" @click="importCloudJson">云端读取</el-button>
                 <el-divider direction="vertical" />
                 <el-button type="primary" @click="exportJson">导出</el-button>
             </div>
@@ -126,6 +128,7 @@
     </div>
 </template>
 <script>
+import axios from 'axios';
 import { ElMessage,ElMessageBox } from 'element-plus';
 export default {
   data(){
@@ -194,6 +197,16 @@ export default {
         };
 
         reader.readAsText(file.raw);
+      },
+      importCloudJson(){
+        axios.get('https://my.wulvxinchen.cn/wordbook/wordData.json').then(res=>{
+                this.AllData.wordData = res.data.wordData
+                this.AllData.hotWords = res.data.hotWords
+                this.AllData.settings = res.data.settings
+                ElMessage.success('云端数据读取成功,导入成功');
+          }).catch(error=>{
+            ElMessage.error('导入失败：' + error.message);
+          });
       },
       exportJson(){
         try {
