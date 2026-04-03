@@ -154,6 +154,45 @@ export default {
       isEditMode: false
     }},
     methods: {
+      saveToLocalStorage() {
+        try {
+          const dataToSave = {
+            wordData: this.AllData.wordData,
+            hotWords: this.AllData.hotWords,
+            settings: this.AllData.settings
+          };
+          localStorage.setItem('wordbook_data', JSON.stringify(dataToSave));
+          ElMessage.success('数据已保存到本地缓存');
+        } catch (error) {
+          ElMessage.error('保存到本地缓存失败:', error);
+        }
+      },
+      loadFromLocalStorage() {
+        try {
+          const savedData = localStorage.getItem('wordbook_data');
+          if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            // 只更新已有字段，避免覆盖其他动态添加的数据
+            if (parsedData.wordData) {
+              this.AllData.wordData = parsedData.wordData.map(item => ({
+                ...item,
+                id: Number(item.id)
+              }));
+            }
+            if (parsedData.hotWords) {
+              this.AllData.hotWords = parsedData.hotWords;
+            }
+            if (parsedData.settings) {
+              this.AllData.settings = parsedData.settings;
+            }
+            ElMessage.success('从本地缓存加载数据成功');
+            return true;
+          }
+        } catch (error) {
+          ElMessage.error('从本地缓存加载数据失败:', error);
+        }
+        return false;
+      },
       importJson(file){
         // file 是 el-upload 包装的文件对象，包含 raw 属性（原始文件）
         if (!file || !file.raw) return;
@@ -183,6 +222,9 @@ export default {
             // 清空已选择的文件列表
             this.$refs.uploadRef.clearFiles();
 
+            // 保存到本地缓存
+            this.saveToLocalStorage();
+
           } catch (error) {
             ElMessage.error('解析JSON文件失败：' + error.message);
           } finally {
@@ -204,6 +246,8 @@ export default {
                 this.AllData.hotWords = res.data.hotWords
                 this.AllData.settings = res.data.settings
                 ElMessage.success('云端数据读取成功,导入成功');
+                // 保存到本地缓存
+                this.saveToLocalStorage();
           }).catch(error=>{
             ElMessage.error('导入失败：' + error.message);
           });
@@ -258,10 +302,14 @@ export default {
         this.AllData.hotWords.push(this.newHotWord.trim());
         this.newHotWord = '';
         ElMessage.success('热词添加成功');
+        // 保存到本地缓存
+        this.saveToLocalStorage();
       },
       removeHotWord(index) {
         this.AllData.hotWords.splice(index, 1);
         ElMessage.success('热词已移除');
+        // 保存到本地缓存
+        this.saveToLocalStorage();
       },
       editTool(id) {
         // 根据id找到对应的词条
@@ -325,6 +373,8 @@ export default {
             // 更新现有词条
             this.AllData.wordData[index] = { ...this.editToolForm };
             ElMessage.success('词条更新成功');
+            // 保存到本地缓存
+            this.saveToLocalStorage();
           } else {
             // 添加新词条 - 检查ID是否已存在（用户可能修改了ID）
             const idExists = this.AllData.wordData.some(item => item.id === parsedId);
@@ -334,6 +384,8 @@ export default {
             }
             this.AllData.wordData.push({ ...this.editToolForm });
             ElMessage.success('词条添加成功');
+            // 保存到本地缓存
+            this.saveToLocalStorage();
           }
 
           this.editFormVisible = false;
