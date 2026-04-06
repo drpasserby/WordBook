@@ -153,6 +153,20 @@ export default {
       },
       isEditMode: false
     }},
+    mounted() {
+      // 尝试从本地缓存加载数据
+      if (localStorage.getItem('wordbook_data')) {
+        ElMessageBox.confirm('检测到本地缓存有数据，是否加载数据？', '提示', {
+          confirmButtonText: '是',
+          cancelButtonText: '否',
+          type: 'warning'
+        }).then(() => {
+          this.loadFromLocalStorage();
+        }).catch(() => {
+          ElMessage.info('取消从本地缓存加载数据');
+        });
+      }
+    },
     methods: {
       saveToLocalStorage() {
         try {
