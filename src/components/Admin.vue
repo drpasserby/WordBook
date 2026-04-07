@@ -31,13 +31,23 @@
             <br><br>
             <div>
                 <el-table :data="AllData.wordData" stripe border v-loading="loading" style="width: 100%" height="600">
-                    <el-table-column prop="id" label="ID"/>
+                    <el-table-column prop="id" label="ID" />
                     <el-table-column prop="w" label="词汇"/>
-                    <el-table-column prop="t" label="标签"/>
+                    <el-table-column prop="t" label="标签">
+                      <template #default="{row}">
+                        <el-tag
+                          v-for="(tag, index) in row.t"
+                          :key="index"
+                          style="margin-right: 4px;"
+                        >
+                          {{ tag }}
+                        </el-tag>
+                      </template>
+                    </el-table-column>
                     <el-table-column fixed="right" label="操作">
-                    <template #default="{row}">
-                        <el-button link type="primary" @click="editTool(row.id)">编辑</el-button>
-                    </template>
+                      <template #default="{row}">
+                          <el-button link type="primary" @click="editTool(row.id)">编辑</el-button>
+                      </template>
                     </el-table-column>
                 </el-table>
             </div>
