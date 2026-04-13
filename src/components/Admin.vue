@@ -24,7 +24,7 @@
                 <el-divider direction="vertical" />
                 <el-button type="primary" @click="exportJson">导出</el-button>
             </div>
-            </div>
+        </div>
         <div class="container">
             <h3>词条管理</h3>
             <el-button type="primary" @click="addTool()">添加新词条</el-button>
@@ -266,10 +266,17 @@ export default {
       },
       importCloudJson(){
         axios.get('https://my.wulvxinchen.cn/wordbook/wordData.json').then(res=>{
-                this.AllData.wordData = res.data.wordData
-                this.AllData.hotWords = res.data.hotWords
-                this.AllData.settings = res.data.settings
-                ElMessage.success('云端数据读取成功,导入成功');
+          let lastdate = res.data.settings && res.data.settings.lastUpdate ? res.data.settings.lastUpdate : '未知';
+                ElMessageBox.confirm(`检测到云端数据读取成功（最后更新日期：${lastdate}），导入数据会覆盖本地缓存数据，确定导入？`, '提示', {
+                  confirmButtonText: '是',
+                  cancelButtonText: '否',
+                  type: 'warning'
+                }).then(() => {
+                  this.AllData.wordData = res.data.wordData
+                  this.AllData.hotWords = res.data.hotWords
+                  this.AllData.settings = res.data.settings
+                  ElMessage.success('云端数据读取成功,导入成功');
+                 });
                 // 保存到本地缓存
                 this.saveToLocalStorage();
           }).catch(error=>{
