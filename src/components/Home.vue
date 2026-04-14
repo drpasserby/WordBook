@@ -237,8 +237,9 @@ export default {
         axios.get('https://my.wulvxinchen.cn/wordbook/wordData.json').then(res=>{
             this.wordData = res.data.wordData
             this.hotWord = res.data.hotWords
-            console.log(this.wordData)
-      })
+        }).catch(error=>{
+            ElMessage.error('数据加载失败，请检查网络连接');
+        })
     }
 }
 </script>
