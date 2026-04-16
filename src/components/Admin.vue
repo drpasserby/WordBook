@@ -188,7 +188,7 @@ export default {
           localStorage.setItem('wordbook_data', JSON.stringify(dataToSave));
           ElMessage.success('数据已保存到本地缓存');
         } catch (error) {
-          ElMessage.error('保存到本地缓存失败:', error);
+          ElMessage.error('保存到本地缓存失败: ' + error.message);
         }
       },
       loadFromLocalStorage() {
@@ -213,7 +213,7 @@ export default {
             return true;
           }
         } catch (error) {
-          ElMessage.error('从本地缓存加载数据失败:', error);
+          ElMessage.error('从本地缓存加载数据失败: ' + error.message);
         }
         return false;
       },
@@ -276,9 +276,13 @@ export default {
                   this.AllData.hotWords = res.data.hotWords
                   this.AllData.settings = res.data.settings
                   ElMessage.success('云端数据读取成功,导入成功');
+                  // 保存到本地缓存
+                  console.log('从云端加载数据成功:', this.AllData)
+                  this.saveToLocalStorage();
+                 }).catch(() => {
+                  // 用户点击取消，不做任何操作
+                  ElMessage.info('已取消导入');
                  });
-                // 保存到本地缓存
-                this.saveToLocalStorage();
           }).catch(error=>{
             ElMessage.error('导入失败：' + error.message);
           });
