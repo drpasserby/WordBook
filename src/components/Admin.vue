@@ -85,6 +85,9 @@
         <div class="container">
             <h3>其他设置</h3>
             <p>最后编辑日期：{{ AllData.settings.lastUpdate || '未设置' }}</p>
+            <div>
+              <el-button type="danger" @click="delLocalStorage">删除本地缓存</el-button>
+            </div>
         </div>
         <el-dialog v-model="editFormVisible" :title="isEditMode ? '编辑词条' : '添加词条'" width="500" align-center>
           <el-form>
@@ -448,6 +451,18 @@ export default {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         this.editToolForm.d = `${year}-${month}-${day}`;
+      },
+      delLocalStorage() {
+        ElMessageBox.confirm('确定要删除本地缓存数据吗？此操作不可恢复。', '确认删除', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(() => {
+          localStorage.removeItem('wordbook_data');
+          ElMessage.success('本地缓存数据已删除');
+        }).catch(() => {
+          ElMessage.info('已取消删除');
+        });
       },
       jumpFeedback() {
         ElMessageBox.confirm('请添加剑斗交流群：916779244', '提示', {
